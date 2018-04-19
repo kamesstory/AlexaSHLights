@@ -1,14 +1,36 @@
 """
-This sample demonstrates a simple skill built with the Amazon Alexa Skills Kit.
-The Intent Schema, Custom Slots, and Sample Utterances for this skill, as well
-as testing instructions are located at http://amzn.to/1LzFrj6
+This is an Alexa Skill for the Duke Smart Home, to turn on or off lights in the
+home via simple voice commands.
 
-For additional samples, visit the Alexa Skills Kit Getting Started guide at
-http://amzn.to/1LGWsLG
+Made as part of the 2017-2018 Smart Home X Project
 """
 
 from __future__ import print_function
 from botocore.vendored import requests
+
+# Dictionary imported directly from 
+# https://dukesmarthomeapi.herokuapp.com/
+room_dict = { 'Dirty Lab': [26], 
+	'Clean Lab Cabinets': [3], 
+	'Clean Lab': [4],
+	'South West Bedroom': [6],
+	'Downstairs Bedroom': [7],
+	'North West Bedroom': [9],
+	'North East Bedroom': [21],
+	'South East Bedroom': [28],
+	'West Balcony': [35],
+	'Front Porch': [35],
+	'Back Porch': [36],
+	'Kitchen': [11],
+	'Front Indoor Lights': [12],
+	'White Board Lights': [31],
+	'Kitchen Cabinets': [38],
+	'Main Room': [11,12,31],
+	'Media Room': [20,24],
+	'Upper Floor': [0,2],
+	'East Upper Bathroom': [17],
+	'West Upper Bathroom': [15],
+	'West Lower Bathroom': [13] }
 
 # --------------- Helpers that build all of the responses ----------------------
 
