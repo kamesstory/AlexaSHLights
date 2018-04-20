@@ -10,27 +10,27 @@ from botocore.vendored import requests
 
 # Dictionary imported directly from 
 # https://dukesmarthomeapi.herokuapp.com/
-room_dict = { 'Dirty Lab': [26], 
-	'Clean Lab Cabinets': [3], 
-	'Clean Lab': [4],
-	'South West Bedroom': [6],
-	'Downstairs Bedroom': [7],
-	'North West Bedroom': [9],
-	'North East Bedroom': [21],
-	'South East Bedroom': [28],
-	'West Balcony': [35],
-	'Front Porch': [35],
-	'Back Porch': [36],
-	'Kitchen': [11],
-	'Front Indoor Lights': [12],
-	'White Board Lights': [31],
-	'Kitchen Cabinets': [38],
-	'Main Room': [11,12,31],
-	'Media Room': [20,24],
-	'Upper Floor': [0,2],
-	'East Upper Bathroom': [17],
-	'West Upper Bathroom': [15],
-	'West Lower Bathroom': [13] }
+room_dict = { 'dirty lab': [26], 
+	'clean lab cabinets': [3], 
+	'clean lab': [4],
+	'south west bedroom': [6],
+	'downstairs bedroom': [7],
+	'north west bedroom': [9],
+	'north east bedroom': [21],
+	'south east bedroom': [28],
+	'west balcony': [35],
+	'front porch': [35],
+	'back porch': [36],
+	'kitchen': [11],
+	'front indoor lights': [12],
+	'white board lights': [31],
+	'kitchen cabinets': [38],
+	'main room': [11,12,31],
+	'media room': [20,24],
+	'upper floor': [0,2],
+	'east upper bathroom': [17],
+	'west upper bathroom': [15],
+	'west lower bathroom': [13] }
 
 # --------------- Helpers that build all of the responses ----------------------
 
@@ -94,10 +94,23 @@ def turn_on_light(intent, session):
 
     if 'LightName' in intent['slots']:
         light_name = intent['slots']['LightName']['value']
-        speech_output = "I have sent in a request to turn on the lights."
+        light_name = str(light_name).strip().lower()
+        if light_name in [k.lower() for k in room_dict.keys()]:
+            light_ids = room_dict.get(light_name)
+            # speech_output = "The following are the light ID numbers: "
+            # for x in [str(j) for j in light_ids]:
+                # speech_output += x + " "
+            # speech_output += ". "
+            speech_output = "I have sent in a request to turn on the lights in the " + light_name + "."
+        else:
+            speech_output = "I have sent in a request to turn on the lights in the " + light_name + "."
         reprompt_text = "Have the lights not turned on? Please try again."
         
-        response = requests.get("https://dukesmarthomeapi.herokuapp.com/lights/7?status=ON")
+        try:
+            for x in [str(j) for j in light_ids]:
+        	    requests.get("https://dukesmarthomeapi.herokuapp.com/lights/" + x + "?status=ON")
+        except:
+        	speech_output = "There was an issue communicating with the server."
     else:
         speech_output = "I'm not sure what room's lights you wanted to turn on. " \
                         "Please try again."
@@ -113,10 +126,23 @@ def turn_off_light(intent, session):
 
     if 'LightName' in intent['slots']:
         light_name = intent['slots']['LightName']['value']
-        speech_output = "I have sent in a request to turn off the lights."
+        light_name = str(light_name).strip().lower()
+        if light_name in [k.lower() for k in room_dict.keys()]:
+            light_ids = room_dict.get(light_name)
+            # speech_output = "The following are the light ID numbers: "
+            # for x in [str(j) for j in light_ids]:
+                # speech_output += x + " "
+            # speech_output += ". "
+            speech_output = "I have sent in a request to turn off the lights in the " + light_name + "."
+        else:
+            speech_output = "I have sent in a request to turn off the lights in the " + light_name + "."
         reprompt_text = "Have the lights not turned off? Please try again."
         
-        response = requests.get("https://dukesmarthomeapi.herokuapp.com/lights/7?status=OFF")
+        try:
+            for x in [str(j) for j in light_ids]:
+        	    requests.get("https://dukesmarthomeapi.herokuapp.com/lights/" + x + "?status=OFF")
+        except:
+        	speech_output = "There was an issue communicating with the server."
     else:
         speech_output = "I'm not sure what room's lights you wanted to turn off. " \
                         "Please try again."
@@ -165,7 +191,7 @@ def on_intent(intent_request, session):
     elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
         return handle_session_end_request()
     else:
-        raise ValueError("Invalid intent")
+        raise ValueError("Invalid intent") # TODO: Make this better instead of just throwing a bloody error
 
 
 def on_session_ended(session_ended_request, session):
